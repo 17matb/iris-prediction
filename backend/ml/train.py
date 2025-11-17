@@ -3,7 +3,6 @@ import mlflow
 from mlflow import sklearn
 from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 
 mlflow.set_experiment("MLflow Quickstart")
