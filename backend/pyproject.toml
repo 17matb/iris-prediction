@@ -10,3 +10,10 @@ dependencies = [
     "pandas>=2.3.3",
     "scikit-learn>=1.7.2",
 ]
+
+[tool.basedpyright]
+typeCheckingMode = "basic"
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportUnknownParameterType = false
+useLibraryCodeForTypes = true
