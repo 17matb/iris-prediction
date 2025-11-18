@@ -11,7 +11,7 @@ API_URL = os.getenv("API_URL", "")
 
 st.markdown("# Iris prediction")
 
-st.markdown("## Please provide values")
+st.markdown("## Veuillez entrer des valeurs")
 col1, col2, col3, col4 = st.columns(4)
 with col1:
     sepal_length = st.number_input("Sepal length (cm)")
@@ -42,7 +42,7 @@ def fetch_iris_prediction(
     return response.json()
 
 
-if st.button("Predict"):
+if st.button("Lancer une prédiction"):
     st.markdown(
-        f"Predicted class: {fetch_iris_prediction(sepal_length, sepal_width, petal_length, petal_width)['prediction']}"
+        f"Classe prédite : {fetch_iris_prediction(sepal_length, sepal_width, petal_length, petal_width)['prediction']}"
     )
