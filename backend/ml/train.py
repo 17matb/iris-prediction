@@ -43,5 +43,6 @@ sklearn.autolog()
 
 lr = LogisticRegression(**params)
 lr.fit(X_train, y_train)
+MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
 joblib.dump(lr, MODEL_PATH)
 logger.info(f"Successfully saved model in {MODEL_PATH}")
