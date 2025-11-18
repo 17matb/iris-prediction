@@ -1,0 +1,61 @@
+name: CI/CD
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/iris-prediction-backend:latest
+      FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/iris-prediction-frontend:latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: récupérer le code
+        uses: actions/checkout@v4
+
+      - name: installer uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.9.10'
+
+      - name: installer python
+        run: uv python install
+
+      - name: uv sync backend
+        working-directory: backend
+        run: uv sync --locked
+
+      - name: run les tests backend
+        working-directory: backend
+        run: uv run pytest
+
+      - name: uv sync docs
+        working-directory: docs
+        run: uv sync --locked
+
+      - name: deploy documentation
+        working-directory: docs
+        run: uv run mkdocs gh-deploy --force --clean
+
+      - name: login GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: build image backend
+        run: docker build -t $BACKEND_IMAGE ./backend
+
+      - name: build image frontend
+        run: docker build -t $FRONTEND_IMAGE ./frontend
+
+      - name: push images
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/iris-prediction-backend:latest
+          docker push ghcr.io/${{ github.repository_owner }}/iris-prediction-frontend:latest
