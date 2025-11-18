@@ -8,6 +8,7 @@ dependencies = [
     "fastapi[standard]>=0.121.2",
     "mlflow>=3.6.0",
     "pandas>=2.3.3",
+    "pytest>=9.0.1",
     "scikit-learn>=1.7.2",
 ]
 
