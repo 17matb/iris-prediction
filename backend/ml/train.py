@@ -1,11 +1,33 @@
+from pathlib import Path
+
 import joblib
 import mlflow
-from mlflow import sklearn
+from logs.logger import get_logger
+from mlflow import exceptions, sklearn
 from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
-mlflow.set_experiment("MLflow Quickstart")
+logger = get_logger(__name__)
+
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR.parent / "model" / "model.pkl"
+logger.info(f"Model will be saved in {MODEL_PATH}")
+DB_PATH = BASE_DIR / "mlruns.db"
+logger.info(f"Database will be saved in {DB_PATH}")
+ARTIFACT_PATH = BASE_DIR / "mlruns"
+logger.info(f"Artifact directory will be at {ARTIFACT_PATH}")
+
+mlflow.set_tracking_uri(f"sqlite:///{DB_PATH}")
+
+experiment_name = "MLFlow quickstart"
+
+try:
+    mlflow.create_experiment(experiment_name, artifact_location=ARTIFACT_PATH.as_uri())
+except exceptions.MlflowException:
+    pass
+
+mlflow.set_experiment(experiment_name)
 
 X, y = datasets.load_iris(return_X_y=True)
 
@@ -14,13 +36,12 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 params = {
     "solver": "lbfgs",
     "max_iter": 1000,
-    "multi_class": "auto",
     "random_state": 8888,
 }
 
 sklearn.autolog()
 
-with mlflow.start_run():
-    lr = LogisticRegression(**params)
-    lr.fit(X_train, y_train)
-    joblib.dump(lr, "../model/model.pkl")
+lr = LogisticRegression(**params)
+lr.fit(X_train, y_train)
+joblib.dump(lr, MODEL_PATH)
+logger.info(f"Successfully saved model in {MODEL_PATH}")

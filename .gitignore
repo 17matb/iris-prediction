@@ -2,3 +2,4 @@ __pycache__/
 mlruns/
 *.pkl
 .env
+mlruns.db
