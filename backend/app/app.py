@@ -9,7 +9,7 @@ app = FastAPI()
 
 logger.info("Loading model...")
 model = joblib.load("./model/model.pkl")
-logger.info("Successfully loaded model...")
+logger.info("Successfully loaded model")
 
 
 class Iris(BaseModel):
