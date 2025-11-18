@@ -34,6 +34,10 @@ jobs:
         working-directory: backend
         run: uv sync --locked
 
+      - name: run train.py
+        working-directory: backend
+        run: uv run python -m ml.train
+
       - name: run les tests backend
         working-directory: backend
         run: uv run python -m pytest
