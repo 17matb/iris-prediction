@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 load_dotenv()
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "*")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 
 logger = get_logger(__name__)
 app = FastAPI()
