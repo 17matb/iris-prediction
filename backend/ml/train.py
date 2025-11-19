@@ -24,7 +24,11 @@ logger.info(f"Artifact directory will be at {ARTIFACT_PATH}")
 
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "")
 
-if MLFLOW_TRACKING_URI and os.getenv("GITHUB_ACTIONS") == "true":
+if (
+    MLFLOW_TRACKING_URI
+    and MLFLOW_TRACKING_URI.startswith("azureml://")
+    and os.getenv("GITHUB_ACTIONS") == "true"
+):
     logger.info("Using Azure ML Tracking Server")
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 else:
@@ -33,7 +37,11 @@ else:
 
 experiment_name = "MLFlow quickstart"
 
-if MLFLOW_TRACKING_URI and os.getenv("GITHUB_ACTIONS") == "true":
+if (
+    MLFLOW_TRACKING_URI
+    and MLFLOW_TRACKING_URI.startswith("azureml://")
+    and os.getenv("GITHUB_ACTIONS") == "true"
+):
     try:
         mlflow.create_experiment(experiment_name)
     except exceptions.MlflowException:
