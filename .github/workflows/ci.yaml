@@ -13,6 +13,7 @@ jobs:
     env:
       BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/iris-prediction-backend:latest
       FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/iris-prediction-frontend:latest
+      MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
 
     permissions:
       contents: write

@@ -1,12 +1,16 @@
+import os
 from pathlib import Path
 
 import joblib
 import mlflow
+from dotenv import load_dotenv
 from logs.logger import get_logger
 from mlflow import exceptions, sklearn
 from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+
+load_dotenv()
 
 logger = get_logger(__name__)
 
@@ -18,14 +22,30 @@ logger.info(f"Database will be saved in {DB_PATH}")
 ARTIFACT_PATH = BASE_DIR / "mlruns"
 logger.info(f"Artifact directory will be at {ARTIFACT_PATH}")
 
-mlflow.set_tracking_uri(f"sqlite:///{DB_PATH}")
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "")
+
+if MLFLOW_TRACKING_URI and os.getenv("GITHUB_ACTIONS") == "true":
+    logger.info("Using Azure ML Tracking Server")
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+else:
+    logger.info(f"Using local SQLite tracking: sqlite:///{DB_PATH}")
+    mlflow.set_tracking_uri(f"sqlite:///{DB_PATH}")
 
 experiment_name = "MLFlow quickstart"
 
-try:
-    mlflow.create_experiment(experiment_name, artifact_location=ARTIFACT_PATH.as_uri())
-except exceptions.MlflowException:
-    pass
+if MLFLOW_TRACKING_URI and os.getenv("GITHUB_ACTIONS") == "true":
+    try:
+        mlflow.create_experiment(experiment_name)
+    except exceptions.MlflowException:
+        pass
+else:
+    try:
+        mlflow.create_experiment(
+            experiment_name, artifact_location=ARTIFACT_PATH.as_uri()
+        )
+    except exceptions.MlflowException:
+        pass
+
 
 mlflow.set_experiment(experiment_name)
 
