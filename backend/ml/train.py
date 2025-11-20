@@ -2,30 +2,30 @@ from pathlib import Path
 
 import joblib
 import mlflow
-from azureml.core import Model, Workspace
-from dotenv import load_dotenv
 from logs.logger import get_logger
+from mlflow import exceptions, sklearn
 from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-
-load_dotenv()
 
 logger = get_logger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR.parent / "model" / "model.pkl"
+logger.info(f"Model will be saved in {MODEL_PATH}")
+DB_PATH = BASE_DIR / "mlruns.db"
+logger.info(f"Database will be saved in {DB_PATH}")
+ARTIFACT_PATH = BASE_DIR / "mlruns"
+logger.info(f"Artifact directory will be at {ARTIFACT_PATH}")
 
-ws = Workspace.from_config()
-tracking_uri = ws.get_mlflow_tracking_uri()
-
-mlflow.set_tracking_uri(tracking_uri)
-logger.info("Using Azure ML Tracking Server")
+mlflow.set_tracking_uri(f"sqlite:///{DB_PATH}")
 
 experiment_name = "MLFlow quickstart"
 
-mlflow.create_experiment(experiment_name)
-
+try:
+    mlflow.create_experiment(experiment_name, artifact_location=ARTIFACT_PATH.as_uri())
+except exceptions.MlflowException:
+    pass
 
 mlflow.set_experiment(experiment_name)
 
@@ -39,16 +39,10 @@ params = {
     "random_state": 8888,
 }
 
-with mlflow.start_run():
-    lr = LogisticRegression(**params)
-    lr.fit(X_train, y_train)
-    mlflow.log_params(params)
-    mlflow.log_metric("accuracy", lr.score(X_test, y_test))
-    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump(lr, MODEL_PATH)
-    Model.register(
-        workspace=ws,
-        model_path=str(MODEL_PATH),
-        model_name="iris-logistic-regression",
-        description="Logistic regression model for iris prediction",
-    )
+sklearn.autolog()
+
+lr = LogisticRegression(**params)
+lr.fit(X_train, y_train)
+MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+joblib.dump(lr, MODEL_PATH)
+logger.info(f"Successfully saved model in {MODEL_PATH}")

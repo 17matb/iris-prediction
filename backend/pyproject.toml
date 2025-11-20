@@ -5,15 +5,12 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "azureml-core>=1.60.0.post1",
-    "azureml-mlflow>=1.60.0",
     "fastapi[standard]>=0.121.2",
     "mlflow>=3.6.0",
     "pandas>=2.3.3",
     "pytest>=9.0.1",
     "python-dotenv>=1.2.1",
     "scikit-learn>=1.7.2",
-    "setuptools>=80.9.0",
 ]
 
 [tool.basedpyright]
