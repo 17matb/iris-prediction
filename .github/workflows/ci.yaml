@@ -36,11 +36,6 @@ jobs:
         working-directory: backend
         run: uv sync --locked
 
-      - name: azure login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - name: run train.py
         working-directory: backend
         run: uv run python -m ml.train
